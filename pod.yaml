@@ -1,0 +1,32 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: server
+spec:
+  serviceName: "server"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: server
+    spec:
+      containers:
+      - name: server
+        image: nginx
+        ports:
+        - containerPort: 80
+          name: http
+        volumeMounts:
+          - name: testgluserfs
+            mountPath: /var/lib/www/html
+            subPath: nginx
+  volumeClaimTemplates:
+  - metadata:
+      name: testgluserfs
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "slow"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 4Gi
